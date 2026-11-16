@@ -1,0 +1,6 @@
+{
+  "name": "SEAM Hotel Management System",
+  "description": "Multi-tenant Hotel Management and Reporting SaaS platform for independent hotels, resorts, and lodges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

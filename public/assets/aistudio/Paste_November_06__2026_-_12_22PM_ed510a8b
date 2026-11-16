@@ -1,0 +1,1959 @@
+# SEAM HOTEL MANAGEMENT SYSTEM
+## FINAL MASTER DEVELOPMENT PROMPT FOR GOOGLE AI STUDIO
+
+**Product:** SEAM Hotel Management System  
+**Product type:** Multi-tenant Hotel Management and Reporting SaaS  
+**Platforms:** Web, Android, iOS-ready Progressive Web App (PWA)  
+**Development environment:** Google AI Studio  
+**Frontend:** React, TypeScript, Tailwind CSS  
+**Backend:** Firebase Authentication, Cloud Firestore, Cloud Storage, Cloud Functions  
+**Architecture:** Modular, multi-tenant SaaS  
+**Development approach:** Seven controlled phases with approval gates.
+
+---
+
+# PART 1. YOUR ROLE AND DEVELOPMENT RESPONSIBILITY
+
+Act as a senior software architect, full-stack engineer, database engineer, hotel operations consultant, financial systems specialist, cybersecurity engineer and professional UX/UI designer.
+
+Your responsibility is to design, build, test and deliver a complete, functional, production-ready Hotel Management and Reporting System.
+
+This is not a demonstration application or a collection of attractive screens.
+
+Every module must have working functionality, database integration, appropriate permissions, validation, calculations, reporting and audit history.
+
+Build a commercial SaaS platform that I can offer to multiple independent hotels under my own SEAM platform brand.
+
+You must follow the development phases in this prompt.
+
+**IMPORTANT DEVELOPMENT RULES**
+
+1. Never attempt to build all seven phases at once.
+2. Complete the current phase before starting another.
+3. Do not remove or damage previously completed functionality.
+4. Do not replace functional modules with static mockups.
+5. Do not use hardcoded hotel information.
+6. Do not invent financial figures in production reports.
+7. Do not claim a feature is complete unless it works and has been tested.
+8. Preserve existing database records during upgrades.
+9. Use reusable components and maintain clean code.
+10. After every phase, explain what was built, what was tested and what remains.
+11. Wait for my explicit instruction, "CONTINUE TO PHASE X", before beginning the next phase.
+
+---
+
+# PART 2. PRODUCT IDENTITY AND COMMERCIAL PURPOSE
+
+## 2.1 Platform identity
+
+The software platform name is:
+
+**SEAM Hotel Management System**
+
+SEAM is the application owner and SaaS provider.
+
+Each subscribing hotel must be able to configure:
+
+- Hotel name.
+- Hotel logo.
+- Address.
+- Telephone number.
+- Email.
+- Website.
+- Country.
+- Currency.
+- Tax/VAT settings.
+- Time zone.
+- Language.
+- Fiscal year.
+- Number of rooms.
+- Departments.
+- Outlets.
+- Employees.
+
+Never permanently write Olive Hotel, or any other individual hotel name, into the application source code as the default business identity.
+
+The application must be reusable for hotels, resorts, lodges, guesthouses and other configurable accommodation businesses.
+
+## 2.2 Commercial model
+
+SEAM operates a subscription-based business.
+
+Support:
+
+- Basic subscription.
+- Standard subscription.
+- Premium subscription.
+- Custom subscription.
+- Monthly billing.
+- Annual billing.
+- Free trials.
+- Manual payment confirmation.
+- Subscription renewal.
+- Grace periods.
+- Suspension.
+- Reactivation.
+- Module restrictions.
+
+The Super Admin must control which hotels can use which features.
+
+## 2.3 Main product objectives
+
+1. Simplify hotel daily operations.
+2. Digitize departmental reporting.
+3. Improve financial transparency.
+4. Strengthen accountability.
+5. Control purchasing and inventory.
+6. Improve hotel profitability.
+7. Provide real-time information to management.
+8. Reduce manual Excel reporting.
+9. Provide owners with reliable management information.
+10. Make hotel management accessible through mobile devices.
+
+---
+
+# PART 3. DESIGN AND USER EXPERIENCE
+
+## 3.1 Design philosophy
+
+The system must be extremely simple, professional and user-friendly.
+
+Many hotel employees are not technical.
+
+Use:
+
+- Large readable text.
+- Large touch-friendly buttons.
+- Clear icons with labels.
+- Simple forms.
+- Dropdown menus.
+- Date pickers.
+- Number pads for amounts.
+- Short instructions.
+- Clear confirmation messages.
+- Simple dashboard cards.
+- Search and filters.
+- Minimal navigation.
+
+A normal employee should complete a common task within three taps wherever practical.
+
+Avoid unnecessary complexity.
+
+## 3.2 Responsive design
+
+Support:
+
+- Android smartphones.
+- iPhones.
+- Tablets.
+- Desktop computers.
+- Laptop computers.
+
+Mobile-first design is mandatory.
+
+On desktop, use a professional sidebar and wider reporting tables.
+
+On mobile, use simple navigation, large cards and compact forms.
+
+## 3.3 Visual identity
+
+Use a professional SEAM visual identity.
+
+Suggested design:
+
+- Primary: Deep navy or dark green.
+- Secondary: Teal.
+- Accent: Warm gold.
+- Background: Clean white or light grey.
+- Dark mode: Professional dark interface.
+
+The hotel can upload its own logo without changing the SEAM platform identity.
+
+## 3.4 Accessibility and usability
+
+Include:
+
+- Light mode.
+- Dark mode.
+- Large-text option.
+- English language.
+- Amharic language readiness.
+- Translation-ready architecture.
+- Minimum 48px touch targets.
+- Screen-reader labels.
+- Friendly empty states.
+- Helpful error messages.
+- Guided first-time user tour.
+
+## 3.5 Offline operation
+
+The system must support offline data entry where technically appropriate.
+
+Show clear synchronization indicators:
+
+- Saved.
+- Waiting to sync.
+- Synchronizing.
+- Synced.
+- Sync failed.
+
+Prevent duplicate records when internet connectivity returns.
+
+Never silently overwrite conflicting financial records.
+
+---
+
+# PART 4. SYSTEM ARCHITECTURE
+
+## 4.1 Technology
+
+Use:
+
+- React.
+- TypeScript.
+- Tailwind CSS.
+- Firebase Authentication.
+- Cloud Firestore.
+- Firebase Storage.
+- Firebase Cloud Functions.
+- Firebase Cloud Messaging.
+- Firebase Hosting or an equivalent supported hosting environment.
+
+Use Capacitor-compatible architecture for future Android and iOS store distribution.
+
+## 4.2 Multi-tenant architecture
+
+This is a mandatory requirement.
+
+One application must support multiple hotels.
+
+Every hotel-owned record must contain:
+
+- hotelId.
+- createdAt.
+- createdBy.
+- updatedAt.
+- updatedBy.
+- status where applicable.
+
+All hotel records must be isolated.
+
+A hotel employee must never access another hotel's data.
+
+Enforce isolation through Firestore Security Rules and server-side authorization, not merely through frontend filtering.
+
+## 4.3 Recommended database architecture
+
+Design the Firestore structure before implementation.
+
+Suggested logical collections:
+
+- platformUsers
+- hotels
+- subscriptions
+- subscriptionPayments
+- platformAnnouncements
+- platformAuditLogs
+- hotelUsers
+- roles
+- permissions
+- departments
+- outlets
+- rooms
+- roomTypes
+- reservations
+- guests
+- guestFolios
+- guestPayments
+- dailyReports
+- reportEntries
+- purchases
+- purchaseOrders
+- suppliers
+- goodsReceipts
+- inventoryItems
+- stockMovements
+- stockCounts
+- recipes
+- menuItems
+- employees
+- attendance
+- leaveRequests
+- payrollPeriods
+- payrollRecords
+- expenses
+- cashSessions
+- financialTransactions
+- accounts
+- journalEntries
+- maintenanceRequests
+- assets
+- preventiveMaintenance
+- events
+- spaBookings
+- complaints
+- feedback
+- notifications
+- budgets
+- targets
+- auditLogs
+- importJobs
+- hotelSettings
+- customFields
+
+You may organize these as top-level collections or hotel-scoped subcollections where appropriate.
+
+Before implementation, define:
+
+1. Collection relationships.
+2. Required fields.
+3. Document references.
+4. Security rules.
+5. Index requirements.
+6. Data retention.
+7. Backup and recovery.
+8. Aggregation strategy.
+
+Do not create unnecessary duplicate collections.
+
+Use server-side transactions and Cloud Functions for sensitive operations.
+
+## 4.4 Data integrity
+
+Every financial transaction must have a unique reference number.
+
+Prevent:
+
+- Duplicate submissions.
+- Unauthorized editing.
+- Unauthorized deletion.
+- Duplicate payments.
+- Duplicate stock movements.
+- Unapproved financial adjustments.
+
+Use soft deletion where appropriate.
+
+Keep historical versions of submitted and approved records.
+
+---
+
+# PART 5. USER LEVELS AND PERMISSION SYSTEM
+
+Implement three main administrative levels.
+
+## 5.1 Super Admin
+
+This is the SEAM platform owner.
+
+Can:
+
+- Create hotels.
+- Edit hotel profiles.
+- Suspend and reactivate hotels.
+- Manage subscriptions.
+- Configure subscription plans.
+- Configure module access.
+- Monitor platform performance.
+- Manage hotel administrators.
+- Send announcements.
+- View subscription payments.
+- Monitor storage and usage.
+- View system audit records.
+- Provide authorized support.
+
+Super Admin must not automatically have unrestricted access to confidential hotel guest and financial records.
+
+Exceptional support access must be explicitly authorized, time-limited and logged.
+
+## 5.2 Hotel Admin
+
+The hotel administrator manages:
+
+- Hotel settings.
+- Employees.
+- User accounts.
+- Roles.
+- Privileges.
+- Departments.
+- Outlets.
+- Rooms.
+- Room types.
+- Approval limits.
+- Reporting deadlines.
+- Notifications.
+- Custom fields.
+- Data exports.
+
+## 5.3 Hotel users
+
+Support configurable roles:
+
+- Owner.
+- General Manager.
+- Deputy General Manager.
+- Finance Manager.
+- Department Head.
+- Supervisor.
+- Senior Staff.
+- Staff.
+- Viewer.
+- Auditor.
+- Custom roles.
+
+## 5.4 Granular permissions
+
+Permission actions must include:
+
+- View.
+- Create.
+- Edit.
+- Delete.
+- Approve.
+- Reject.
+- Export.
+- Share.
+- Comment.
+- View reports.
+- Manage users.
+- Manage settings.
+- Reopen closed records.
+
+Permissions must be assigned by module, department, action and individual user where necessary.
+
+The Hotel Admin must be able to grant temporary cross-department access with an expiry date.
+
+Owner and GM can have read access across departments.
+
+Owner access can be configured as read-only.
+
+Department employees should only see the information needed for their jobs.
+
+Employee status:
+
+- Active.
+- On Leave.
+- Suspended.
+- Terminated.
+
+Never hard-delete an employee account in a way that destroys historical accountability.
+
+---
+
+# PART 6. SEVEN DEVELOPMENT PHASES
+
+## PHASE 1: SAAS FOUNDATION AND SUPER ADMIN
+
+**Objective:** Build the secure foundation of the entire platform.
+
+Do not build all hotel operational modules in this phase.
+
+### 1. Project setup
+
+Create:
+
+- React application.
+- TypeScript configuration.
+- Tailwind CSS.
+- Firebase integration.
+- Environment configuration.
+- Reusable UI components.
+- Routing structure.
+- Authentication structure.
+- Error handling.
+- Responsive application shell.
+
+Establish a clean folder structure.
+
+### 2. Authentication
+
+Implement:
+
+- Email and password login.
+- Phone/email account support where properly configured.
+- Password reset.
+- Account invitation.
+- First-login password change.
+- Session management.
+- Logout.
+- Inactive-user protection.
+
+Use Firebase Authentication.
+
+Do not store plain-text passwords.
+
+### 3. Multi-tenant foundation
+
+Implement:
+
+- Hotel registration.
+- Unique hotel IDs.
+- Hotel data isolation.
+- Tenant-aware queries.
+- Hotel configuration records.
+- Firestore Security Rules.
+
+Create tests that prove one hotel cannot access another hotel's data.
+
+### 4. Super Admin panel
+
+Create a separate Super Admin interface.
+
+Screens:
+
+1. Super Admin Login.
+2. Main Dashboard.
+3. Hotel Management.
+4. Create Hotel.
+5. Edit Hotel.
+6. Subscription Management.
+7. Subscription Payment Records.
+8. Module Management.
+9. Hotel User Management.
+10. Platform Announcements.
+11. Audit Logs.
+12. Platform Settings.
+
+### 5. Hotel registration
+
+When creating a hotel, collect:
+
+- Hotel name.
+- Logo.
+- Address.
+- Contact information.
+- Country.
+- Currency.
+- Time zone.
+- Number of rooms.
+- Subscription plan.
+- Subscription start date.
+- Expiry date.
+- Maximum users.
+- Maximum rooms.
+- Enabled modules.
+
+Create the first Hotel Admin account through a secure invitation process.
+
+### 6. Subscription management
+
+Support:
+
+- Basic.
+- Standard.
+- Premium.
+- Custom.
+
+Make plans editable.
+
+Subscription controls:
+
+- Price.
+- Billing cycle.
+- Start date.
+- Expiry date.
+- Maximum users.
+- Maximum rooms.
+- Enabled modules.
+- Payment status.
+- Grace period.
+- Suspension status.
+
+When a subscription expires:
+
+1. Display a warning.
+2. Allow the configured grace period.
+3. Switch the hotel to read-only when the grace period ends.
+4. Lock access according to the configured policy.
+5. Allow Super Admin to reactivate it.
+
+Preserve all historical data during suspension.
+
+### 7. Super Admin dashboard
+
+Display:
+
+- Total registered hotels.
+- Active hotels.
+- Expired hotels.
+- Suspended hotels.
+- Hotels expiring within 30 days.
+- Subscription revenue.
+- Outstanding subscription payments.
+- New registrations.
+- Active users.
+- Enabled modules.
+- Platform usage.
+
+### 8. Permission foundation
+
+Create the role and permission engine.
+
+Support:
+
+- Role templates.
+- Custom roles.
+- Module-level privileges.
+- Action-level privileges.
+- Temporary privileges.
+- User-level overrides.
+- Permission audit logs.
+
+### 9. Phase 1 testing
+
+Test:
+
+- Super Admin login.
+- Hotel creation.
+- Hotel editing.
+- Subscription creation.
+- Subscription expiry.
+- Subscription suspension.
+- Reactivation.
+- Hotel Admin invitation.
+- User access.
+- Permission enforcement.
+- Cross-hotel data isolation.
+
+### Phase 1 deliverables
+
+Before proceeding, provide:
+
+- Working application foundation.
+- Working Super Admin dashboard.
+- Multi-tenant database structure.
+- Authentication.
+- Subscription controls.
+- Role and permission foundation.
+- Security rules.
+- Test results.
+- Instructions for testing.
+
+**STOP AFTER PHASE 1. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 2: HOTEL ADMINISTRATION AND CONFIGURATION
+
+**Objective:** Enable each subscribing hotel to configure its own operations.
+
+### 1. Hotel Admin dashboard
+
+Build a separate Hotel Admin area.
+
+Include:
+
+- Hotel profile.
+- Hotel logo.
+- Users.
+- Departments.
+- Outlets.
+- Rooms.
+- Room types.
+- User roles.
+- Permissions.
+- Approval limits.
+- Notification settings.
+- Financial settings.
+- Language settings.
+- Report deadlines.
+
+### 2. Employee management
+
+Employee records:
+
+- Employee ID.
+- Full name.
+- Telephone.
+- Email.
+- Department.
+- Position.
+- Employment date.
+- Employment status.
+- User account.
+- Assigned privileges.
+
+Support bulk employee registration using Excel and CSV.
+
+### 3. Department configuration
+
+Create configurable departments.
+
+Default departments:
+
+1. Front Office.
+2. Housekeeping.
+3. Food and Beverage.
+4. Kitchen.
+5. Bar.
+6. Finance.
+7. Human Resources.
+8. Purchasing.
+9. Stores.
+10. Engineering and Maintenance.
+11. Security.
+12. Sales and Marketing.
+13. Conference and Events.
+14. Spa and Wellness.
+15. Guest Relations.
+
+Allow hotels to activate, deactivate, rename and add departments.
+
+### 4. Outlet management
+
+Allow multiple outlets:
+
+- Main Restaurant.
+- Bar.
+- Coffee Shop.
+- Room Service.
+- Pool Bar.
+- Other configurable outlets.
+
+### 5. Room management
+
+Create:
+
+- Room number.
+- Floor.
+- Room type.
+- Capacity.
+- Standard rate.
+- Status.
+- Amenities.
+- Maintenance status.
+
+Support different hotel sizes.
+
+### 6. Financial configuration
+
+Allow the Hotel Admin to configure:
+
+- Currency.
+- VAT percentage.
+- Service charge.
+- Fiscal year.
+- Financial periods.
+- Account codes.
+- Payment methods.
+- Expense categories.
+- Financial approval limits.
+
+Support Ethiopian Birr (ETB) and other international currencies.
+
+### 7. Custom fields
+
+Allow authorized administrators to create custom fields:
+
+- Text.
+- Number.
+- Amount.
+- Dropdown.
+- Date.
+- Yes/No.
+- Photo.
+- Attachment.
+
+### Phase 2 deliverables
+
+A working Hotel Admin dashboard, hotel configuration, employee management, department setup, outlets, rooms and settings.
+
+Test all configuration and permissions.
+
+**STOP AFTER PHASE 2. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 3: HOTEL OPERATIONS AND DAILY DATA ENTRY
+
+**Objective:** Digitize daily hotel operations.
+
+Each department must have its own simple dashboard, daily entry forms, history and reports.
+
+### A. FRONT OFFICE AND RESERVATIONS
+
+Build a complete configurable Front Office module.
+
+Functions:
+
+- Reservation creation.
+- Reservation modification.
+- Cancellation.
+- Walk-in registration.
+- Individual reservations.
+- Group bookings.
+- Room availability calendar.
+- Room assignment.
+- Guest check-in.
+- Guest check-out.
+- Room transfers.
+- Stay extensions.
+- No-show tracking.
+- Room rate management.
+- Discount authorization.
+- Complimentary rooms.
+- Guest payment.
+- Outstanding guest balances.
+- Guest folios.
+- Cashier closing.
+- Night audit.
+
+Prevent double booking.
+
+Calculate:
+
+- Occupancy percentage.
+- ADR.
+- RevPAR.
+- Room revenue.
+- Available rooms.
+- Occupied rooms.
+- Out-of-order rooms.
+
+### B. GUEST DATABASE AND CRM
+
+Create guest profiles.
+
+Fields:
+
+- Guest name.
+- Telephone.
+- Email.
+- Country.
+- Nationality.
+- Company.
+- Identification details where permitted.
+- Previous stays.
+- Stay history.
+- Guest preferences.
+- Complaints.
+- Revenue generated.
+- Communication consent.
+
+Support guest search and duplicate detection.
+
+Protect sensitive guest information.
+
+### C. HOUSEKEEPING
+
+Functions:
+
+- Room status.
+- Clean.
+- Dirty.
+- Inspected.
+- Occupied.
+- Out of Service.
+- Out of Order.
+- Room cleaning assignments.
+- Room inspection.
+- Linen tracking.
+- Laundry records.
+- Amenity usage.
+- Lost and found.
+- Minibar checking.
+- Housekeeping complaints.
+- Daily room reconciliation.
+
+Provide a simple room-status board.
+
+### D. FOOD AND BEVERAGE
+
+Functions:
+
+- Restaurant daily sales.
+- Bar daily sales.
+- Room service sales.
+- Covers.
+- Sales by outlet.
+- Sales by category.
+- Discounts.
+- Complimentary orders.
+- Voids.
+- Wastage.
+- Top-selling items.
+- Daily outlet closing.
+
+Support configurable sales entry and integration with POS systems where available.
+
+### E. KITCHEN AND F&B CONTROL
+
+Create a separate F&B Control function.
+
+Include:
+
+- Menu item records.
+- Recipes.
+- Ingredient quantities.
+- Standard recipe costing.
+- Food cost.
+- Beverage cost.
+- Actual consumption.
+- Theoretical consumption.
+- Store requisitions.
+- Wastage.
+- Spoilage.
+- Kitchen stock reconciliation.
+- Menu profitability.
+
+Allow authorized users to edit ingredient costs, recipe quantities and selling prices.
+
+### F. STORES AND INVENTORY
+
+Functions:
+
+- Item master.
+- Categories.
+- Units of measurement.
+- Opening stock.
+- Goods Received Voucher.
+- Store issue voucher.
+- Stock transfers.
+- Stock adjustments.
+- Physical counts.
+- Closing stock.
+- Low-stock alerts.
+- Reorder levels.
+- Supplier records.
+- Purchase price history.
+- Stock valuation.
+- Expiry tracking.
+- Wastage.
+- Damaged stock.
+
+Support Ethiopian and international measurement units, including kilogram, gram, litre, millilitre, piece, box, packet and configurable conversions.
+
+Support weighted-average and FIFO valuation methods.
+
+### G. SPA AND WELLNESS
+
+Functions:
+
+- Treatment records.
+- Appointment booking.
+- Guest details.
+- Therapist assignment.
+- Service prices.
+- Product sales.
+- Daily revenue.
+- Utilization.
+- Service performance.
+
+### H. CONFERENCE AND EVENTS
+
+Functions:
+
+- Event booking.
+- Customer details.
+- Event date.
+- Hall assignment.
+- Capacity.
+- Event type.
+- Number of attendees.
+- Menu package.
+- Equipment requirements.
+- Deposits.
+- Outstanding balances.
+- Final revenue.
+- Event closing.
+
+Prevent double booking of the same facility at overlapping times.
+
+### I. SALES AND MARKETING
+
+Functions:
+
+- Leads.
+- Corporate accounts.
+- Travel agents.
+- Booking sources.
+- Direct bookings.
+- OTA bookings.
+- Walk-in bookings.
+- Promotions.
+- Corporate contracts.
+- Sales follow-up.
+- Online review tracking.
+- Sales conversion.
+
+### J. HUMAN RESOURCES
+
+Functions:
+
+- Employee records.
+- Attendance.
+- Shifts.
+- Leave.
+- Leave balances.
+- Overtime.
+- Recruitment.
+- New hires.
+- Exits.
+- Training.
+- Performance evaluation.
+- Disciplinary records.
+- Payroll summaries.
+
+Detailed payroll calculation will be completed in Phase 4.
+
+### K. SECURITY
+
+Functions:
+
+- Incident log.
+- Visitor log.
+- Lost and found.
+- Security observations.
+- Incident assignment.
+- Investigation status.
+- Resolution.
+
+### L. GUEST COMPLAINTS AND FEEDBACK
+
+Functions:
+
+- Complaint entry.
+- Guest details.
+- Department assignment.
+- Priority.
+- Resolution deadline.
+- Action taken.
+- Resolution time.
+- Guest feedback.
+- Escalation.
+
+### M. CUSTOM DEPARTMENTS
+
+Allow Hotel Admin to create additional departments with custom data entry forms.
+
+### N. COMMON DAILY REPORTING
+
+Every department must have:
+
+- Daily entry.
+- Daily history.
+- Edit permission.
+- Submission.
+- Department Head verification.
+- Daily closing.
+- Attachments.
+- Comments.
+- Exportable reports.
+
+Every entry must contain date, time, responsible user and department.
+
+### Phase 3 deliverables
+
+All activated departmental modules must have functional forms, database integration, validation, history, permissions and reporting.
+
+**STOP AFTER PHASE 3. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 4: FINANCIAL MANAGEMENT, PURCHASING AND INTERNAL CONTROLS
+
+**Objective:** Establish strong financial accountability.
+
+### A. FINANCE AND ACCOUNTS
+
+Build:
+
+- Revenue management.
+- Expense management.
+- Cash management.
+- Bank transactions.
+- Mobile money transactions.
+- Petty cash.
+- Accounts payable.
+- Accounts receivable.
+- Supplier invoices.
+- Payment vouchers.
+- Receipt vouchers.
+- Financial transactions.
+- Financial reconciliation.
+
+### B. CASHIER MANAGEMENT
+
+Every cashier session must contain:
+
+- Opening balance.
+- Cash received.
+- Cash paid.
+- Cash transfers.
+- Expected closing balance.
+- Actual closing balance.
+- Cash shortage.
+- Cash overage.
+- Supervisor verification.
+
+Allow cash, bank transfer, mobile payment and credit transactions.
+
+### C. ACCOUNTING
+
+Implement a configurable accounting structure.
+
+Include:
+
+- Chart of accounts.
+- General ledger.
+- Journal entries.
+- Trial balance.
+- Income statement.
+- Balance sheet.
+- Cash flow statement.
+- Departmental profit and loss.
+- VAT reports.
+- Receivables.
+- Payables.
+- Financial closing.
+
+Support configurable USALI-style departmental reporting.
+
+All accounting transactions must balance where double-entry accounting is used.
+
+### D. ETHIOPIAN FINANCIAL SETTINGS
+
+Provide configurable:
+
+- Ethiopian Birr.
+- VAT.
+- Service charge.
+- Payroll tax parameters.
+- Pension parameters.
+- Fiscal year.
+- Ethiopian and Gregorian date display options where required.
+
+Tax and statutory rates must be editable by authorized users and maintained with effective dates.
+
+Do not hardcode tax rates into financial calculations.
+
+### E. PURCHASING AND APPROVAL
+
+Any employee may raise a purchase request.
+
+Fields:
+
+- Item.
+- Quantity.
+- Unit.
+- Estimated price.
+- Reason.
+- Department.
+- Urgency.
+- Needed-by date.
+- Photo.
+- Attachment.
+
+Workflow:
+
+Employee → Department Head → Purchasing → Finance → GM → Owner, according to configurable approval rules.
+
+Support amount-based approval limits.
+
+Statuses:
+
+- Draft.
+- Submitted.
+- Pending Approval.
+- Approved.
+- Rejected.
+- Returned for Correction.
+- Ordered.
+- Partially Received.
+- Received.
+- Paid.
+- Closed.
+
+Approved requests can generate Purchase Orders.
+
+Record:
+
+- Supplier.
+- Quotation.
+- Actual price.
+- Goods received.
+- Invoice.
+- Payment.
+- Receipt attachment.
+
+### F. INVENTORY FINANCIAL CONTROL
+
+Every stock movement must be traceable.
+
+Separate responsibilities:
+
+- Requesting.
+- Approving.
+- Purchasing.
+- Receiving.
+- Issuing.
+- Recording payments.
+
+Prevent one person from bypassing the configured approval process.
+
+### G. PAYROLL
+
+Implement:
+
+- Salary structures.
+- Basic salary.
+- Allowances.
+- Overtime.
+- Deductions.
+- Tax.
+- Pension.
+- Net salary.
+- Payroll periods.
+- Payroll approval.
+- Payslip.
+- Payroll reports.
+
+Make statutory parameters configurable and effective-dated.
+
+Restrict payroll access.
+
+### H. BUDGET CONTROL
+
+Allow budgets by:
+
+- Department.
+- Expense category.
+- Month.
+- Quarter.
+- Year.
+
+Show:
+
+- Budget.
+- Actual expenditure.
+- Remaining balance.
+- Variance.
+- Variance percentage.
+- Approval status.
+
+### I. FINANCIAL PERIOD CLOSING
+
+Closed periods must become read-only.
+
+Corrections require authorized adjustment entries or controlled reopening.
+
+Preserve the original values and correction history.
+
+### Phase 4 deliverables
+
+A functional financial and purchasing system with reconciliations, approvals, inventory integration, payroll, budgets and audit trails.
+
+Test all financial calculations.
+
+**STOP AFTER PHASE 4. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 5: REPORTING ENGINE AND MANAGEMENT INTELLIGENCE
+
+**Objective:** Turn daily hotel data into reliable management decisions.
+
+This is one of the most important parts of the application.
+
+All dashboards and reports must use verified database records.
+
+Never use manually invented figures in production reports.
+
+### A. GENERAL MANAGER DASHBOARD
+
+Create a professional dashboard showing:
+
+**Hotel performance**
+- Occupancy.
+- ADR.
+- RevPAR.
+- Total revenue.
+- Total expenses.
+- Profit.
+- Room revenue.
+- Restaurant revenue.
+- Bar revenue.
+- Conference revenue.
+- Wellness revenue.
+
+**Operational performance**
+- Available rooms.
+- Occupied rooms.
+- Out-of-order rooms.
+- Guest complaints.
+- Maintenance requests.
+- Pending purchases.
+- Department report submissions.
+- Outstanding approvals.
+
+**Financial performance**
+- Cash position.
+- Outstanding receivables.
+- Outstanding payables.
+- Budget versus actual.
+- Revenue growth.
+- Departmental profitability.
+
+**Department performance**
+- Daily submission status.
+- Target achievement.
+- Department ranking.
+- Performance alerts.
+
+### B. OWNER DASHBOARD
+
+The Owner dashboard should be simple and executive-focused.
+
+Show:
+
+- Total revenue.
+- Total expenses.
+- Operating profit.
+- Occupancy trend.
+- Revenue trend.
+- Profitability.
+- Department performance.
+- Budget performance.
+- Major operational issues.
+- Cash and receivable summaries.
+
+Support read-only access.
+
+### C. DEPARTMENT DASHBOARDS
+
+Each department sees its own performance.
+
+Include:
+
+- Daily activity.
+- Monthly performance.
+- Targets.
+- Actual results.
+- Variances.
+- Pending actions.
+- Department reports.
+
+### D. HOTEL PERFORMANCE INDICATORS
+
+Calculate:
+
+1. Occupancy Percentage.
+2. Average Daily Rate (ADR).
+3. Revenue per Available Room (RevPAR).
+4. Revenue per Occupied Room.
+5. Total Revenue per Available Room (TRevPAR).
+6. Gross Operating Profit (GOP).
+7. GOPPAR.
+8. Average Length of Stay.
+9. Food Cost Percentage.
+10. Beverage Cost Percentage.
+11. Payroll Cost Percentage.
+12. Departmental Profit Margin.
+13. Revenue per Employee.
+14. Complaint Resolution Time.
+
+Document every formula.
+
+For example:
+
+Occupancy = Occupied Sellable Rooms ÷ Available Sellable Rooms × 100.
+
+ADR = Room Revenue ÷ Rooms Sold.
+
+RevPAR = Room Revenue ÷ Available Sellable Rooms.
+
+GOPPAR = Gross Operating Profit ÷ Available Sellable Rooms.
+
+Handle out-of-order rooms, complimentary rooms and other exceptions according to configurable reporting rules.
+
+### E. REPORT TYPES
+
+Generate:
+
+- Daily reports.
+- Weekly reports.
+- Monthly reports.
+- Quarterly reports.
+- Annual reports.
+- Custom date-range reports.
+
+Provide comparisons with:
+
+- Previous period.
+- Same period last year.
+- Budget.
+- Target.
+- Forecast.
+
+### F. CONSOLIDATED HOTEL REPORT
+
+Automatically combine departmental information.
+
+Include:
+
+1. Executive summary.
+2. Hotel operational performance.
+3. Rooms department.
+4. Food and Beverage.
+5. Conference and Events.
+6. Spa and Wellness.
+7. Finance.
+8. Human Resources.
+9. Purchasing.
+10. Inventory.
+11. Maintenance.
+12. Guest feedback.
+13. Management observations.
+14. Action points.
+
+### G. CHARTS AND TABLES
+
+Use professional:
+
+- Bar charts.
+- Line charts.
+- Pie charts.
+- Performance tables.
+- Comparison tables.
+- Trend charts.
+
+Provide filters for date, department, outlet and employee.
+
+### H. EXPORTS
+
+Allow:
+
+- PDF.
+- Excel.
+- CSV.
+- Image.
+
+Every report should contain:
+
+- Hotel logo.
+- Hotel name.
+- Reporting period.
+- Report title.
+- Prepared by.
+- Generated date.
+- Currency.
+
+### I. AUTOMATED REPORTS
+
+Allow scheduled reports.
+
+Examples:
+
+- Daily summary to GM.
+- Daily executive report to Owner.
+- Weekly department report.
+- Monthly management pack.
+- Monthly financial report.
+
+Support in-app notifications and email where configured.
+
+### J. MISSING REPORT ALERTS
+
+If a department does not submit its report by the configured deadline:
+
+- Notify the department head.
+- Notify the GM.
+- Display a dashboard warning.
+- Record the missing submission.
+
+### K. BUDGET AND TARGET MANAGEMENT
+
+Allow the GM to set monthly targets.
+
+Show:
+
+- Target.
+- Actual.
+- Variance.
+- Achievement percentage.
+- Forecast.
+- Management comments.
+
+### Phase 5 deliverables
+
+Fully working dashboards, management reports, departmental reports, financial reports, charts, comparisons and exports.
+
+Verify every important calculation against source transactions.
+
+**STOP AFTER PHASE 5. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 6: APPROVALS, FEEDBACK, NOTIFICATIONS AND AUDIT
+
+**Objective:** Establish communication and accountability throughout the hotel.
+
+### A. REPORT FEEDBACK
+
+The GM and authorized users can comment on departmental reports.
+
+Allow:
+
+- General feedback.
+- Specific figure comments.
+- Section comments.
+- Instructions.
+- Ratings.
+- Employee responses.
+
+Feedback statuses:
+
+- Sent.
+- Seen.
+- Acknowledged.
+- Action in Progress.
+- Action Done.
+
+Keep the complete conversation attached to the report.
+
+### B. PURCHASE APPROVAL NOTIFICATIONS
+
+Notify:
+
+- Requester.
+- Department Head.
+- Purchasing.
+- Finance.
+- GM.
+- Owner.
+
+Send notifications whenever an approval action changes the status.
+
+### C. MAINTENANCE REQUESTS
+
+Any employee must be able to submit a maintenance request in under 30 seconds.
+
+Fields:
+
+- Location.
+- Room.
+- Category.
+- Description.
+- Priority.
+- Photo.
+
+Categories:
+
+- Plumbing.
+- Electrical.
+- Air Conditioning.
+- Furniture.
+- IT.
+- Equipment.
+- Other.
+
+Workflow:
+
+Reported → Assigned → In Progress → Waiting for Parts → Completed → Verified.
+
+Allow:
+
+- Technician assignment.
+- Progress updates.
+- Completion photos.
+- Purchase request linking.
+- Requester confirmation.
+
+### D. PREVENTIVE MAINTENANCE
+
+Create:
+
+- Asset register.
+- Equipment details.
+- Maintenance schedules.
+- Recurring maintenance.
+- Service history.
+- Cost history.
+- Reminder notifications.
+
+### E. REPORT SHARING
+
+Allow permitted users to:
+
+- Download PDF.
+- Download images.
+- Share through WhatsApp.
+- Share through Telegram.
+- Share through email.
+- Copy report links.
+- Use the device's native share menu.
+
+Apply permission checks.
+
+Support sensitive-data masking.
+
+Log all report-sharing activities.
+
+### F. NOTIFICATIONS
+
+Create an in-app notification centre.
+
+Support:
+
+- Purchase approvals.
+- Maintenance updates.
+- Report feedback.
+- Missing reports.
+- Guest complaints.
+- Subscription warnings.
+- Daily summaries.
+- Department deadlines.
+
+Support push notifications through Firebase Cloud Messaging where available.
+
+Allow users to configure notification preferences.
+
+### G. AUDIT LOGS
+
+Track:
+
+- User.
+- Date.
+- Time.
+- Device where available.
+- Action.
+- Module.
+- Record ID.
+- Previous value.
+- New value.
+- Reason for change.
+
+Protect audit logs against ordinary user modification.
+
+### H. USER ACCOUNTABILITY
+
+Show users:
+
+- Pending approvals.
+- Assigned maintenance tasks.
+- Report feedback.
+- Outstanding actions.
+- Tasks awaiting completion.
+
+### Phase 6 deliverables
+
+Functional feedback, approvals, notifications, maintenance workflows, sharing and audit logs.
+
+Test all workflow transitions and access controls.
+
+**STOP AFTER PHASE 6. WAIT FOR MY APPROVAL.**
+
+---
+
+## PHASE 7: FINAL POLISH, SECURITY AND COMMERCIAL DEPLOYMENT
+
+**Objective:** Prepare SEAM for actual hotel customers.
+
+### A. OFFLINE AND SYNCHRONIZATION
+
+Complete offline capabilities.
+
+Test:
+
+- Weak internet.
+- Internet interruption.
+- Offline form entry.
+- Automatic synchronization.
+- Duplicate prevention.
+- Conflicting changes.
+- Failed synchronization recovery.
+
+### B. MOBILE APPLICATION READINESS
+
+Complete:
+
+- PWA installation.
+- Android compatibility.
+- iOS compatibility.
+- Capacitor readiness.
+- Mobile navigation.
+- Touch-friendly forms.
+- Device camera access where permitted.
+- File attachments.
+- Native sharing where supported.
+
+### C. LANGUAGE SUPPORT
+
+Complete:
+
+- English.
+- Amharic.
+
+Make the system translation-ready for additional languages.
+
+### D. SECURITY TESTING
+
+Test:
+
+- Cross-hotel data isolation.
+- Unauthorized access.
+- Role privileges.
+- Financial approval restrictions.
+- Account suspension.
+- Session revocation.
+- Data export permissions.
+- Sensitive information protection.
+- Subscription enforcement.
+
+### E. BACKUP AND RECOVERY
+
+Implement:
+
+- Automatic scheduled backups.
+- Backup status.
+- Restoration procedures.
+- Data export.
+- Data retention.
+- Hotel termination procedures.
+
+Test actual restoration, not just backup creation.
+
+### F. PERFORMANCE
+
+Optimize:
+
+- Dashboard loading.
+- Database queries.
+- Pagination.
+- Search.
+- Report generation.
+- File uploads.
+- Mobile performance.
+
+Use indexed queries and pre-aggregated reporting data where appropriate.
+
+### G. DEMONSTRATION ENVIRONMENT
+
+Create demonstration data for at least two independent hotels.
+
+Include:
+
+- Different hotel identities.
+- Different departments.
+- Different employee accounts.
+- Different subscriptions.
+- Different financial settings.
+- Different room configurations.
+
+Verify complete isolation.
+
+Clearly identify all demonstration data.
+
+### H. DOCUMENTATION
+
+Create:
+
+- Installation guide.
+- Firebase setup guide.
+- Deployment guide.
+- Super Admin guide.
+- Hotel Admin guide.
+- Employee user guide.
+- Database documentation.
+- Security documentation.
+- Backup guide.
+- Subscription management guide.
+- Troubleshooting guide.
+
+### I. FINAL ACCEPTANCE TEST
+
+The application must pass these tests:
+
+1. Create a new hotel.
+2. Create its Hotel Admin.
+3. Configure departments.
+4. Register employees.
+5. Assign permissions.
+6. Enter departmental data.
+7. Submit daily reports.
+8. Create purchase requests.
+9. Complete approval workflows.
+10. Receive inventory.
+11. Record financial transactions.
+12. Generate daily reports.
+13. Generate monthly reports.
+14. Export Excel and PDF.
+15. Verify GM and Owner access.
+16. Test subscription expiry.
+17. Test cross-hotel security.
+18. Test offline operation.
+19. Test backups and recovery.
+20. Test Android and desktop interfaces.
+
+### Phase 7 deliverables
+
+A tested, documented, deployable SaaS platform ready for controlled pilot use with real hotel customers.
+
+Do not describe the platform as production-ready until all critical security, financial and recovery tests have passed.
+
+---
+
+# PART 7. GLOBAL BUSINESS AND FINANCIAL RULES
+
+These rules apply to all seven phases.
+
+1. Never hardcode an individual hotel's identity.
+2. Never hardcode hotel room numbers or employee names.
+3. Never hardcode selling prices, tax rates or service charges.
+4. Make operational settings configurable.
+5. Use a single source of truth for financial transactions.
+6. Use reusable calculation functions.
+7. Preserve historical financial information.
+8. Every approval must identify the approving user.
+9. Every important transaction must have a reference number.
+10. Every closed report must have a traceable history.
+11. Every dashboard must use real database data.
+12. Never silently change historical transactions.
+13. Use role-based permissions on both frontend and backend.
+14. Never expose secret credentials in frontend code.
+15. Keep each hotel's information isolated.
+16. Do not allow subscription restrictions to destroy hotel data.
+17. Do not allow unauthorized users to export confidential reports.
+18. All modules must work on mobile and desktop.
+
+---
+
+# PART 8. DEVELOPMENT QUALITY AND CODE MANAGEMENT
+
+Before implementing each phase:
+
+1. Review the existing application.
+2. Identify existing working functionality.
+3. Review the database structure.
+4. Identify dependencies.
+5. Plan the changes.
+6. Implement without breaking previous functionality.
+7. Test the new functionality.
+8. Test previous functionality affected by the changes.
+
+Maintain:
+
+- Clean folder structure.
+- Reusable components.
+- Shared services.
+- Centralized permission checking.
+- Centralized calculations.
+- Database migration documentation.
+- Error logging.
+- Automated tests.
+- Version control readiness.
+
+Never pretend that a frontend-only implementation has a working backend.
+
+If a Firebase service requires credentials, configuration or deployment, identify exactly what is needed.
+
+Never invent deployment URLs or claim that an external service has been configured without verification.
+
+---
+
+# PART 9. PHASE COMPLETION AND APPROVAL PROTOCOL
+
+At the end of every phase, provide a report in simple language.
+
+Use this structure:
+
+**PHASE COMPLETION REPORT**
+
+1. Features completed.
+2. Screens created.
+3. Database collections created or modified.
+4. Functional tests performed.
+5. Security tests performed.
+6. Known limitations.
+7. Outstanding work.
+8. Instructions for me to test the application.
+9. Confirmation that existing functionality was preserved.
+
+Use these statuses:
+
+- Complete and tested.
+- Implemented but not fully tested.
+- Pending.
+- Blocked.
+
+Do not mark pending features as complete.
+
+Then stop.
+
+Wait for my explicit instruction to continue.
+
+---
+
+# PART 10. START NOW: PHASE 1 ARCHITECTURE REVIEW
+
+Your first task is NOT to start generating the entire application.
+
+Begin with the architecture and design of Phase 1.
+
+Present the following for my review:
+
+**1. FIRESTORE DATABASE DESIGN**
+
+Show:
+- Collections.
+- Important fields.
+- Relationships.
+- Hotel ID isolation.
+- User records.
+- Subscription records.
+- Audit records.
+
+**2. ROLE AND PERMISSION MATRIX**
+
+Show the differences between:
+- Super Admin.
+- Hotel Admin.
+- Owner.
+- GM.
+- Department Head.
+- Supervisor.
+- Staff.
+- Viewer.
+
+**3. APPLICATION SCREEN MAP**
+
+Show the complete Phase 1 navigation and screens.
+
+**4. MULTI-TENANT ARCHITECTURE**
+
+Explain how multiple independent hotels will operate within the same application without sharing confidential data.
+
+**5. SUBSCRIPTION WORKFLOW**
+
+Explain registration, activation, payment, grace period, expiry, suspension and reactivation.
+
+**6. SECURITY ARCHITECTURE**
+
+Show how Firebase Authentication, custom claims, Firestore Security Rules and Cloud Functions will work together.
+
+**7. PHASE 1 IMPLEMENTATION PLAN**
+
+Show the development order and acceptance tests.
+
+Use simple diagrams, tables and clear explanations.
+
+Do not begin Phase 1 coding until I approve the proposed architecture.
+
+After I approve, implement Phase 1 completely.
+
+When Phase 1 passes its acceptance tests, stop and wait for:
+
+CONTINUE TO PHASE 2.
+
+Apply the same approval process to all remaining phases.
+
+---
+
+# FINAL INSTRUCTION
+
+I am building SEAM as a commercial hotel management software business, not just an application for one hotel.
+
+Think about long-term scalability, financial accuracy, security, usability, maintainability and the ability to onboard many independent hotels.
+
+Build carefully, one phase at a time.
+
+**Start with Phase 1 architecture review now.**

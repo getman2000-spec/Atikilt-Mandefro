@@ -1,0 +1,497 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ==========================================
+    // GLOBAL HARDENED PRIMITIVES
+    // ==========================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isEmailVerified() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isEmailVerified() && (
+        request.auth.token.email == 'getman2000@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isActiveHotelMember(hotelId) {
+      return isEmailVerified() &&
+        exists(/databases/$(database)/documents/hotels/$(hotelId)/members/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/hotels/$(hotelId)/members/$(request.auth.uid)).data.status == 'active';
+    }
+
+    function isHotelAdminMember(hotelId) {
+      return isActiveHotelMember(hotelId) &&
+        get(/databases/$(database)/documents/hotels/$(hotelId)/members/$(request.auth.uid)).data.role in ['hotel_admin', 'gm', 'owner'];
+    }
+
+    function hasActiveGrantFor(grantId, targetHotelId, targetRole) {
+      return isEmailVerified() &&
+        isValidId(grantId) &&
+        exists(/databases/$(database)/documents/accessGrants/$(grantId)) &&
+        get(/databases/$(database)/documents/accessGrants/$(grantId)).data.emailLower == request.auth.token.email.lower() &&
+        get(/databases/$(database)/documents/accessGrants/$(grantId)).data.status == 'active' &&
+        get(/databases/$(database)/documents/accessGrants/$(grantId)).data.hotelId == targetHotelId &&
+        get(/databases/$(database)/documents/accessGrants/$(grantId)).data.role == targetRole;
+    }
+
+    // ==========================================
+    // VALIDATION BLUEPRINTS (ANTI-UPDATE-GAP)
+    // ==========================================
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'role', 'status', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'displayName', 'role', 'hotelId', 'status', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 128 &&
+        data.role in ['super_admin', 'hotel_admin', 'gm', 'deputy_gm', 'finance_manager', 'dept_head', 'supervisor', 'senior_staff', 'staff', 'viewer', 'auditor', 'owner', 'custom'] &&
+        data.status in ['active', 'suspended'] &&
+        (!('hotelId' in data) || isValidId(data.hotelId)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'phone', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 256 &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 40)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAdminRecord(data) {
+      return data.keys().hasAll(['uid', 'email', 'grantedBy', 'createdAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'grantedBy', 'grantId', 'createdAt']) &&
+        isValidId(data.uid) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 256 &&
+        isValidId(data.grantedBy) &&
+        (!('grantId' in data) || isValidId(data.grantId)) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidHotelTenant(data) {
+      return data.keys().hasAll(['id', 'code', 'name', 'ownerUid', 'status', 'subscriptionStatus', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'code', 'name', 'ownerUid', 'status', 'subscriptionStatus', 'createdAt', 'updatedAt']) &&
+        isValidId(data.id) &&
+        data.code is string && data.code.size() >= 1 && data.code.size() <= 32 && data.code.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 160 &&
+        isValidId(data.ownerUid) &&
+        data.status in ['active', 'suspended'] &&
+        data.subscriptionStatus in ['active', 'grace_period', 'suspended'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidHotelMember(data) {
+      return data.keys().hasAll(['uid', 'hotelId', 'role', 'status', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'hotelId', 'role', 'status', 'grantId', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        isValidId(data.hotelId) &&
+        data.role in ['hotel_admin', 'gm', 'deputy_gm', 'finance_manager', 'dept_head', 'supervisor', 'senior_staff', 'staff', 'viewer', 'auditor', 'owner', 'custom'] &&
+        data.status in ['active', 'suspended'] &&
+        (!('grantId' in data) || isValidId(data.grantId)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAccessGrant(data) {
+      return data.keys().hasAll(['grantId', 'emailLower', 'fullName', 'hotelId', 'role', 'status', 'grantedByUid', 'grantedByRole', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['grantId', 'emailLower', 'fullName', 'hotelId', 'role', 'departmentName', 'employeeId', 'status', 'grantedByUid', 'grantedByRole', 'createdAt', 'updatedAt']) &&
+        isValidId(data.grantId) &&
+        data.emailLower is string && data.emailLower.size() >= 3 && data.emailLower.size() <= 256 &&
+        data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 128 &&
+        isValidId(data.hotelId) &&
+        data.role in ['super_admin', 'hotel_admin', 'gm', 'deputy_gm', 'finance_manager', 'dept_head', 'supervisor', 'senior_staff', 'staff', 'viewer', 'auditor', 'owner', 'custom'] &&
+        (!('departmentName' in data) || (data.departmentName is string && data.departmentName.size() <= 128)) &&
+        (!('employeeId' in data) || (data.employeeId is string && data.employeeId.size() <= 64)) &&
+        data.status in ['active', 'invited', 'on_leave', 'suspended', 'terminated'] &&
+        isValidId(data.grantedByUid) &&
+        data.grantedByRole in ['super_admin', 'hotel_admin', 'gm', 'owner'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidModuleBucket(data) {
+      return data.keys().hasAll(['bucketKey', 'hotelId', 'ownerUid', 'records', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['bucketKey', 'hotelId', 'ownerUid', 'records', 'businessDate', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        isValidId(data.bucketKey) &&
+        isValidId(data.hotelId) &&
+        isValidId(data.ownerUid) &&
+        data.records is list &&
+        data.records.size() <= 1000 &&
+        (data.records.size() == 0 || data.records[0] is map) &&
+        (!('businessDate' in data) || (data.businessDate is string && data.businessDate.size() <= 32)) &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 128 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPlatformBucket(data) {
+      return data.keys().hasAll(['bucketKey', 'ownerUid', 'records', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['bucketKey', 'ownerUid', 'records', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        isValidId(data.bucketKey) &&
+        isValidId(data.ownerUid) &&
+        data.records is list &&
+        data.records.size() <= 1000 &&
+        (data.records.size() == 0 || data.records[0] is map) &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 128 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidUserWorkspaceBucket(data) {
+      return data.keys().hasAll(['bucketKey', 'ownerUid', 'records', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['bucketKey', 'ownerUid', 'records', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        isValidId(data.bucketKey) &&
+        isValidId(data.ownerUid) &&
+        data.records is list &&
+        data.records.size() <= 1000 &&
+        (data.records.size() == 0 || data.records[0] is map) &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 128 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // ==========================================
+    // COLLECTION MATCH RULES
+    // ==========================================
+
+    // 1. User Profiles & Split PII
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isEmailVerified() && (
+        resource.data.uid == request.auth.uid ||
+        request.auth.token.email == 'getman2000@gmail.com'
+      );
+
+      allow create: if isValidId(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().uid == userId &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (
+          isAdmin() ||
+          (isOwner(userId) && incoming().role == 'staff' && incoming().status == 'active')
+        );
+
+      allow update: if isValidId(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          isAdmin() ||
+          (
+            isOwner(userId) &&
+            existing().status == 'active' &&
+            incoming().role == existing().role &&
+            incoming().status == existing().status &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(userId) && isAdmin();
+
+      match /private/info {
+        allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+        allow list: if false;
+
+        allow create: if isValidId(userId) &&
+          isValidUserPrivateInfo(incoming()) &&
+          incoming().uid == userId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          (isOwner(userId) || isAdmin());
+
+        allow update: if isValidId(userId) &&
+          isValidUserPrivateInfo(incoming()) &&
+          incoming().uid == existing().uid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (
+            isAdmin() ||
+            (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'updatedAt']))
+          );
+
+        allow delete: if isValidId(userId) && isAdmin();
+      }
+    }
+
+    // 2. Trusted Admins Registry
+    match /admins/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isEmailVerified() && request.auth.token.email == 'getman2000@gmail.com';
+      allow create: if isValidId(userId) &&
+        isValidAdminRecord(incoming()) &&
+        incoming().uid == userId &&
+        incoming().createdAt == request.time &&
+        (
+          (isAdmin() && incoming().grantedBy == request.auth.uid) ||
+          (
+            isOwner(userId) &&
+            'grantId' in incoming() &&
+            hasActiveGrantFor(incoming().grantId, 'platform', 'super_admin')
+          )
+        );
+      allow update: if false;
+      allow delete: if isValidId(userId) && isAdmin() && userId != request.auth.uid;
+    }
+
+    // 3. Admin-Privileged Access Grants Registry
+    match /accessGrants/{grantId} {
+      allow get: if isValidId(grantId) && isEmailVerified() && (
+        isAdmin() ||
+        existing().emailLower == request.auth.token.email.lower() ||
+        existing().grantedByUid == request.auth.uid ||
+        isHotelAdminMember(existing().hotelId)
+      );
+      allow list: if isEmailVerified() && (
+        request.auth.token.email == 'getman2000@gmail.com' ||
+        resource.data.emailLower == request.auth.token.email.lower() ||
+        resource.data.grantedByUid == request.auth.uid
+      );
+
+      allow create: if isValidId(grantId) &&
+        isValidAccessGrant(incoming()) &&
+        incoming().grantId == grantId &&
+        incoming().grantedByUid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (
+          (isAdmin() && incoming().grantedByRole == 'super_admin') ||
+          (
+            incoming().role != 'super_admin' &&
+            incoming().grantedByRole in ['hotel_admin', 'gm', 'owner'] &&
+            isHotelAdminMember(incoming().hotelId) &&
+            exists(/databases/$(database)/documents/hotels/$(incoming().hotelId))
+          )
+        );
+
+      allow update: if isValidId(grantId) &&
+        isValidAccessGrant(incoming()) &&
+        incoming().grantId == existing().grantId &&
+        incoming().emailLower == existing().emailLower &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().grantedByUid == request.auth.uid &&
+        (
+          (isAdmin() && incoming().grantedByRole == 'super_admin') ||
+          (
+            existing().role != 'super_admin' &&
+            incoming().role != 'super_admin' &&
+            incoming().hotelId == existing().hotelId &&
+            incoming().grantedByRole in ['hotel_admin', 'gm', 'owner'] &&
+            isHotelAdminMember(existing().hotelId) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'role', 'departmentName', 'employeeId', 'status', 'grantedByUid', 'grantedByRole', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(grantId) && (
+        isAdmin() ||
+        (existing().role != 'super_admin' && isHotelAdminMember(existing().hotelId))
+      );
+    }
+
+    // 4. Hotel Tenants & Subcollections
+    match /hotels/{hotelId} {
+      allow get: if isValidId(hotelId) && (isActiveHotelMember(hotelId) || isAdmin());
+      allow list: if isEmailVerified() && (
+        resource.data.ownerUid == request.auth.uid ||
+        request.auth.token.email == 'getman2000@gmail.com'
+      );
+
+      allow create: if isValidId(hotelId) &&
+        isAdmin() &&
+        isValidHotelTenant(incoming()) &&
+        incoming().id == hotelId &&
+        incoming().ownerUid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isValidId(hotelId) &&
+        isValidHotelTenant(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().ownerUid == existing().ownerUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          isAdmin() ||
+          (
+            isHotelAdminMember(hotelId) &&
+            existing().status != 'suspended' &&
+            incoming().status == existing().status &&
+            incoming().subscriptionStatus == existing().subscriptionStatus &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['name', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(hotelId) && isAdmin();
+
+      match /members/{userId} {
+        allow get: if isValidId(hotelId) && isValidId(userId) && (isOwner(userId) || isHotelAdminMember(hotelId) || isAdmin());
+        allow list: if isEmailVerified() && (
+          resource.data.uid == request.auth.uid ||
+          request.auth.token.email == 'getman2000@gmail.com'
+        );
+
+        allow create: if isValidId(hotelId) && isValidId(userId) &&
+          (exists(/databases/$(database)/documents/hotels/$(hotelId)) || existsAfter(/databases/$(database)/documents/hotels/$(hotelId))) &&
+          isValidHotelMember(incoming()) &&
+          incoming().uid == userId &&
+          incoming().hotelId == hotelId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          (
+            isAdmin() ||
+            isHotelAdminMember(hotelId) ||
+            (
+              isOwner(userId) &&
+              incoming().status == 'active' &&
+              'grantId' in incoming() &&
+              hasActiveGrantFor(incoming().grantId, hotelId, incoming().role)
+            )
+          );
+
+        allow update: if isValidId(hotelId) && isValidId(userId) &&
+          isValidHotelMember(incoming()) &&
+          incoming().uid == existing().uid &&
+          incoming().hotelId == existing().hotelId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (isAdmin() || (isHotelAdminMember(hotelId) && incoming().diff(existing()).affectedKeys().hasOnly(['role', 'status', 'updatedAt'])));
+
+        allow delete: if isValidId(hotelId) && isValidId(userId) && (isAdmin() || isHotelAdminMember(hotelId));
+      }
+
+      match /moduleBuckets/{bucketKey} {
+        allow get: if isValidId(hotelId) && isValidId(bucketKey) && (isActiveHotelMember(hotelId) || isAdmin());
+        allow list: if isEmailVerified() && (
+          resource.data.ownerUid == request.auth.uid ||
+          request.auth.token.email == 'getman2000@gmail.com'
+        );
+
+        allow create: if isValidId(hotelId) && isValidId(bucketKey) &&
+          (exists(/databases/$(database)/documents/hotels/$(hotelId)) || existsAfter(/databases/$(database)/documents/hotels/$(hotelId))) &&
+          isValidModuleBucket(incoming()) &&
+          incoming().bucketKey == bucketKey &&
+          incoming().hotelId == hotelId &&
+          incoming().ownerUid == request.auth.uid &&
+          incoming().updatedBy == request.auth.uid &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          (isActiveHotelMember(hotelId) || isAdmin());
+
+        allow update: if isValidId(hotelId) && isValidId(bucketKey) &&
+          isValidModuleBucket(incoming()) &&
+          incoming().bucketKey == existing().bucketKey &&
+          incoming().hotelId == existing().hotelId &&
+          incoming().ownerUid == existing().ownerUid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().updatedBy == request.auth.uid &&
+          (
+            isAdmin() ||
+            (
+              isActiveHotelMember(hotelId) &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['records', 'businessDate', 'updatedBy', 'updatedAt'])
+            )
+          );
+
+        allow delete: if isValidId(hotelId) && isValidId(bucketKey) && isAdmin();
+      }
+    }
+
+    // 5. Platform Governance Buckets (Super Admin)
+    match /platformBuckets/{bucketKey} {
+      allow get: if isValidId(bucketKey) && isAdmin();
+      allow list: if isEmailVerified() && (
+        resource.data.ownerUid == request.auth.uid ||
+        request.auth.token.email == 'getman2000@gmail.com'
+      );
+
+      allow create: if isValidId(bucketKey) &&
+        isAdmin() &&
+        isValidPlatformBucket(incoming()) &&
+        incoming().bucketKey == bucketKey &&
+        incoming().ownerUid == request.auth.uid &&
+        incoming().updatedBy == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isValidId(bucketKey) &&
+        isAdmin() &&
+        isValidPlatformBucket(incoming()) &&
+        incoming().bucketKey == existing().bucketKey &&
+        incoming().ownerUid == existing().ownerUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().updatedBy == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['records', 'updatedBy', 'updatedAt']);
+
+      allow delete: if isValidId(bucketKey) && isAdmin();
+    }
+
+    // 6. Owner-Isolated User Workspace Buckets (Non-Admin Authenticated Sync)
+    match /userWorkspaces/{userId}/buckets/{bucketKey} {
+      allow get: if isValidId(userId) && isValidId(bucketKey) && (isOwner(userId) || isAdmin());
+      allow list: if isOwner(userId) && resource.data.ownerUid == request.auth.uid;
+
+      allow create: if isValidId(userId) && isValidId(bucketKey) &&
+        isOwner(userId) &&
+        isValidUserWorkspaceBucket(incoming()) &&
+        incoming().bucketKey == bucketKey &&
+        incoming().ownerUid == request.auth.uid &&
+        incoming().updatedBy == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isValidId(userId) && isValidId(bucketKey) &&
+        isValidUserWorkspaceBucket(incoming()) &&
+        incoming().bucketKey == existing().bucketKey &&
+        incoming().ownerUid == existing().ownerUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().updatedBy == request.auth.uid &&
+        (
+          isAdmin() ||
+          (
+            isOwner(userId) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['records', 'updatedBy', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(userId) && isValidId(bucketKey) && (isOwner(userId) || isAdmin());
+    }
+  }
+}

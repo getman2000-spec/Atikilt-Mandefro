@@ -1,0 +1,397 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Authenticated platform or hotel user profile without self-assigned admin privileges.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Full display name",
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "description": "Assigned RBAC role",
+          "enum": ["super_admin", "hotel_admin", "gm", "deputy_gm", "finance_manager", "dept_head", "supervisor", "senior_staff", "staff", "viewer", "auditor", "owner", "custom"]
+        },
+        "hotelId": {
+          "type": "string",
+          "description": "Assigned primary hotel tenant ID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "status": {
+          "type": "string",
+          "description": "Account status",
+          "enum": ["active", "suspended"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "role", "status", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "User Private Info",
+      "description": "Isolated PII record containing email and phone number for a user.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "createdAt", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "Admin Record",
+      "description": "Trusted platform Super Admin registry.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "grantedBy": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grantId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "grantedBy", "createdAt"]
+    },
+    "HotelTenant": {
+      "title": "Hotel Tenant",
+      "description": "Authoritative multi-tenant hotel property record.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "ownerUid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended"]
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": ["active", "grace_period", "suspended"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "code", "name", "ownerUid", "status", "subscriptionStatus", "createdAt", "updatedAt"]
+    },
+    "HotelMember": {
+      "title": "Hotel Member",
+      "description": "Membership binding between a Firebase Auth user and a hotel tenant.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "hotelId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["hotel_admin", "gm", "deputy_gm", "finance_manager", "dept_head", "supervisor", "senior_staff", "staff", "viewer", "auditor", "owner", "custom"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended"]
+        },
+        "grantId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "hotelId", "role", "status", "createdAt", "updatedAt"]
+    },
+    "AccessGrant": {
+      "title": "Access Grant",
+      "description": "Email-based role privilege provisioned by a Super Admin or Property Admin before/upon Google Sign-In.",
+      "type": "object",
+      "properties": {
+        "grantId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "emailLower": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "fullName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "hotelId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["super_admin", "hotel_admin", "gm", "deputy_gm", "finance_manager", "dept_head", "supervisor", "senior_staff", "staff", "viewer", "auditor", "owner", "custom"]
+        },
+        "departmentName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "employeeId": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "invited", "on_leave", "suspended", "terminated"]
+        },
+        "grantedByUid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grantedByRole": {
+          "type": "string",
+          "enum": ["super_admin", "hotel_admin", "gm", "owner"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["grantId", "emailLower", "fullName", "hotelId", "role", "status", "grantedByUid", "grantedByRole", "createdAt", "updatedAt"]
+    },
+    "ModuleBucket": {
+      "title": "Module Bucket",
+      "description": "Tenant-scoped hospitality dataset bucket synced natively with Firestore.",
+      "type": "object",
+      "properties": {
+        "bucketKey": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "hotelId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "records": {
+          "type": "array",
+          "description": "Native Firestore array of structured module entities"
+        },
+        "businessDate": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["bucketKey", "hotelId", "ownerUid", "records", "updatedBy", "createdAt", "updatedAt"]
+    },
+    "PlatformBucket": {
+      "title": "Platform Bucket",
+      "description": "Platform-level SaaS governance dataset bucket managed by Super Admins.",
+      "type": "object",
+      "properties": {
+        "bucketKey": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "records": {
+          "type": "array",
+          "description": "Native Firestore array of structured platform records"
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["bucketKey", "ownerUid", "records", "updatedBy", "createdAt", "updatedAt"]
+    },
+    "UserWorkspaceBucket": {
+      "title": "User Workspace Bucket",
+      "description": "Owner-isolated workspace dataset bucket for signed-in non-admin users.",
+      "type": "object",
+      "properties": {
+        "bucketKey": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "records": {
+          "type": "array",
+          "description": "Native Firestore array of user workspace records"
+        },
+        "updatedBy": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["bucketKey", "ownerUid", "records", "updatedBy", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Public/internal role profile document scoped strictly to owner or admin."
+    },
+    "/users/{userId}/private/info": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Isolated PII document storing email and phone strictly for owner or admin."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Trusted Super Admin registry."
+    },
+    "/hotels/{hotelId}": {
+      "schema": { "$ref": "#/entities/HotelTenant" },
+      "description": "Master hotel tenant documents."
+    },
+    "/hotels/{hotelId}/members/{userId}": {
+      "schema": { "$ref": "#/entities/HotelMember" },
+      "description": "Per-hotel staff membership and role assignment subcollection."
+    },
+    "/hotels/{hotelId}/moduleBuckets/{bucketKey}": {
+      "schema": { "$ref": "#/entities/ModuleBucket" },
+      "description": "Tenant-isolated operational datasets for all 27 hotel modules."
+    },
+    "/platformBuckets/{bucketKey}": {
+      "schema": { "$ref": "#/entities/PlatformBucket" },
+      "description": "Super Admin SaaS governance buckets (hotels, subscriptions, payments, audit logs, announcements)."
+    },
+    "/userWorkspaces/{userId}/buckets/{bucketKey}": {
+      "schema": { "$ref": "#/entities/UserWorkspaceBucket" },
+      "description": "Owner-isolated cloud persistence buckets for authenticated non-admin workspace users."
+    },
+    "/accessGrants/{grantId}": {
+      "schema": { "$ref": "#/entities/AccessGrant" },
+      "description": "Admin-provisioned role and tenant access grants keyed by deterministic email digest."
+    }
+  }
+}

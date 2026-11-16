@@ -1,0 +1,131 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Ethiopic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Noto Sans Ethiopic", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-seam-forest: #173F35;
+  --color-seam-forest-hover: #113028;
+  --color-seam-olive: #647B52;
+  --color-seam-gold: #C6A15B;
+  --color-seam-bg: #F6F8F6;
+  --color-seam-surface: #FFFFFF;
+  --color-seam-text: #202B27;
+  --color-seam-muted: #78837D;
+  --color-seam-border: #E6EBE7;
+}
+
+:root {
+  --seam-bg: #F6F8F6;
+  --seam-surface: #FFFFFF;
+  --seam-surface-subtle: #F1F4F1;
+  --seam-text: #202B27;
+  --seam-text-secondary: #78837D;
+  --seam-border: #E6EBE7;
+  --seam-forest: #173F35;
+  --seam-olive: #647B52;
+  --seam-gold: #C6A15B;
+}
+
+.dark {
+  --seam-bg: #0D1412;
+  --seam-surface: #131D1A;
+  --seam-surface-subtle: #192622;
+  --seam-text: #ECF1EE;
+  --seam-text-secondary: #92A199;
+  --seam-border: #22322C;
+  --seam-forest: #246353;
+  --seam-olive: #7B9666;
+  --seam-gold: #D3B06B;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--seam-bg);
+    color: var(--seam-text);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  button:not(:disabled),
+  select:not(:disabled),
+  a[href] {
+    cursor: pointer;
+  }
+
+  *:focus-visible {
+    outline: 2px solid #C6A15B;
+    outline-offset: 2px;
+  }
+}
+
+/* Tabular numbers for all financial figures, metrics, and table columns */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reusable SEAM Enterprise Surface & Control Tokens */
+.seam-surface {
+  background-color: var(--seam-surface);
+  border: 1px solid var(--seam-border);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(23, 63, 53, 0.04);
+}
+
+.seam-surface-subtle {
+  background-color: var(--seam-surface-subtle);
+  border: 1px solid var(--seam-border);
+  border-radius: 8px;
+}
+
+.seam-input {
+  background-color: var(--seam-surface);
+  border: 1px solid var(--seam-border);
+  color: var(--seam-text);
+  border-radius: 8px;
+  transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seam-input:focus {
+  border-color: #173F35;
+  box-shadow: 0 0 0 3px rgba(23, 63, 53, 0.12);
+  outline: none;
+}
+
+.dark .seam-input:focus {
+  border-color: #C6A15B;
+  box-shadow: 0 0 0 3px rgba(198, 161, 91, 0.16);
+}
+
+/* Subtle custom scrollbars for enterprise tables and navigation */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 131, 125, 0.28);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 131, 125, 0.48);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
